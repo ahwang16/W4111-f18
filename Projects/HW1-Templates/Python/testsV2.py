@@ -1,5 +1,5 @@
 
-import CSVTableV2
+import CSVTable
 import json
 import sys, os
 
@@ -7,7 +7,7 @@ print (os.path.realpath('.'))
 
 def test1():
 
-    csvt = CSVTableV2.CSVTable("People", "PeopleSmall.csv", ["playerID"])
+    csvt = CSVTable.CSVTable("People", "PeopleSmall.csv", ["playerID"])
     csvt.load()
     print("Table = ", csvt)
 
@@ -19,7 +19,7 @@ def test_template(test_name, table_name, table_file, key_columns, template, fiel
     print("Fields = ", fields)
 
     try:
-        csvt = CSVTableV2.CSVTable(table_name, table_file, key_columns)
+        csvt = CSVTable.CSVTable(table_name, table_file, key_columns)
         csvt.load()
 
         if not show_rows:
@@ -42,7 +42,7 @@ def test_insert(test_name, table_name, table_file, key_columns, row, show_rows=F
     print("Row to insert = ", row)
 
     try:
-        csvt = CSVTableV2.CSVTable(table_name, table_file, key_columns)
+        csvt = CSVTable.CSVTable(table_name, table_file, key_columns)
         csvt.load()
 
         if not show_rows:
@@ -126,6 +126,8 @@ def test_inserts():
     test_template("Find after insert 3", "Batting", "BattingSmall.csv", ["playerID", "yearID", "teamID", "stint"],
                   {"playerID": "dff1"}, None,
                   False)
+
+    
 
 
 test_inserts()
