@@ -59,7 +59,18 @@ class TableDefinition:
         :param index_definitions: List of index definitions. Column names must be valid.
         :param cnx: Database connection to use. If None, create a default connection.
         """
-        pass
+        self.t_name = t_name
+        self.csv_f = csv_f
+
+        ### COLUMN DEFINITIONS ###
+
+
+        if not cnx:
+        	self.cnx = pymysql.connect(host="localhost", port=3306, dbuser="dbuser", password="dbuser", cursorclass=pymysql.cursors.DictCursor)
+        else:
+        	self.cnx = cnx
+
+
 
     def __str__(self):
         pass
@@ -93,7 +104,7 @@ class TableDefinition:
     def to_json(self):
         """
 
-        :return: A JSON representation of the table and it's elements.
+        :return: A JSON representation of the table and its elements.
         """
         pass
 
@@ -140,9 +151,9 @@ class TableDefinition:
 
 class CSVCatalog:
 
-    def __init__(self, dbhost="somedefault", dbport="somedefault",
-                 dbname="somedefault", dbuser="somedefault", dbpw="somedefault", debug_mode=None):
-        pass
+    def __init__(self, dbhost="localhost", dbport="3306",
+                 dbname="csvdatatable", dbuser="dbuser", dbpw="dbuser", debug_mode=None):
+        self.cnx = pymysql.connect(host=dbhost, port=dbport, user=dbuser, password=dbpw, database=dbname, cursorclass=pymysql.cursors.DictCursor)
 
     def __str__(self):
         pass
