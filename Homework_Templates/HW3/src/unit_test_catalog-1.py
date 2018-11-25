@@ -1,5 +1,4 @@
-
-from Homeworks.HW3.src import CSVCatalog
+import CSVCatalog
 
 import time
 import json
@@ -30,7 +29,7 @@ def test_create_table_1():
     cat = CSVCatalog.CSVCatalog()
     t = cat.create_table(
         "people",
-        "/Users/donaldferguson/Dropbox/ColumbiaCourse/Courses/Fall2018/W4111/Data/People.csv")
+        "People.csv")
     print("People table", json.dumps(t.describe_table()))
     print_test_separator("Complete test_create_table_1")
 
@@ -43,12 +42,10 @@ def test_create_table_2_fail():
     print_test_separator("Starting test_create_table_2_fail")
     cleanup()
     cat = CSVCatalog.CSVCatalog()
-    t = cat.create_table("people",
-     "/Users/donaldferguson/Dropbox/ColumbiaCourse/Courses/Fall2018/W4111-Projects/CSVDB/Data/core/People.csv")
+    t = cat.create_table("people", "People.csv")
 
     try:
-        t = cat.create_table("people",
-             "/Users/donaldferguson/Dropbox/ColumbiaCourse/Courses/Fall2018/W4111-Projects/CSVDB/Data/core/People.csv")
+        t = cat.create_table("people","People.csv")
     except Exception as e:
         print("Second created failed with e = ", e)
         print("Second create should fail.")
@@ -134,7 +131,7 @@ def test_create_table_4():
 
     
 
-test_create_table_1()
+# test_create_table_1()
 test_create_table_2_fail()
 test_create_table_3()
 test_create_table_3_fail()
