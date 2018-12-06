@@ -1,4 +1,4 @@
-from py2neo import Graph, NodeMatcher, Node, Relationship
+from py2neo import Graph, NodeMatcher, Node, Relationship, RelationshipMatcher
 import json
 from HW4Template.utils import utils as ut
 import uuid
@@ -19,6 +19,7 @@ class FanGraph(object):
                             host=host,
                             port=port)
         self._node_matcher = NodeMatcher(self._graph)
+        self._relationship_matcher = RelationshipMatcher(self._graph)
 
     def run_match(self, labels=None, properties=None):
         """
@@ -155,7 +156,50 @@ class FanGraph(object):
         :param player_id: A valid player ID or None
         :return: The Node representing the comment.
         """
-        pass
+        if uni is None or comment is None or (team_id is None and player_id is None):
+            raise ValueError("Invalid input")
+
+        try: 
+            tx = self._graph.begin(autocommit=False)
+
+            f = self.get_fan(uni)
+            if f is None:
+                raise ValueError("Fan not found")
+
+            if player_id is not None:
+                p = self.get_player(player_id)
+                if p is None:
+                    raise ValueError("Player not found")
+
+            if team_id is not None:
+                t = self.get_team(team_id)
+                if t is None:
+                    raise ValueError("Player not found")
+
+            comment_id = uuid.uuid4()
+
+            new_c = Node("Comment", comment_id=comment_id, comment=comment)
+            tx.create(new_c)
+
+            r1 = Relationship(f, "COMMENT_BY", new_c)
+            tx.create(r1)
+
+            if p is not None:
+                r2 = Relationship(new_c, "COMMENT_ON", p)
+                tx.create(r2)
+
+            if t is not None:
+                r3 = Relationship(new_c, "COMMENT_ON", t)
+                tx.create(r3)
+
+            tx.commit()
+
+            return new_c
+
+        except Exception as e:
+            print("Exception is e ", e)
+            tx.rollback()
+            raise(e)
 
     def create_sub_comment(self, uni, origin_comment_id, comment):
         """
@@ -165,7 +209,36 @@ class FanGraph(object):
         :param comment: Comment string
         :return: Created comment.
         """
-        pass
+        if uni is None or origin_comment_id is None or comment is None:
+            raise ValueError("Bad input")
+
+        tx = self._graph.begin()
+
+        try:
+            new_comment_id = str(uuid.uuid4())
+            new_c = Node("Comment", comment=comment, comment_id=new_comment_id)
+            tx.create(new_c)
+
+            f = self.get_fan(uni)
+            old_c = self.get_comment(origin_comment_id)
+
+            if f is None or old_c is None:
+                raise ValueError("Fan or original comment not found")
+            
+            r1 = Relationship(f, "RESPONSE_BY", new_c)
+            tx.create(r1)
+
+            r2 = Relationship(new_c, "RESPONSE_TO", old_c)
+            tx.create(r2)
+
+            tx.commit()
+
+            return new_c
+
+        except Exception as e:
+            print("Exception = e", e)
+            tx.rollback()
+            raise e
 
 
     def get_player_comments(self, player_id):
@@ -175,7 +248,9 @@ class FanGraph(object):
         :param player_id: ID of the player.
         :return: Graph containing comment, comment streams and commenters.
         """
-        pass
+        q = 'match (fan)=[by:COMMENT_BY]->(comment)-[on:COMMENT_ON]->(player:Player {player_id: {pid}}) return player, on, comment, by, fan'
+        result = self._graph.run(q, pid=player_id)
+        return result
 
     def get_team_comments(self, team_id):
         """
@@ -184,7 +259,16 @@ class FanGraph(object):
         :param player_id: ID of the team.
         :return: Graph containing comment, comment streams and commenters.
         """
-        pass
+        q = 'match (fan)=[by:COMMENT_BY]->(comment)-[on:COMMENT_ON]->(team:Team {team_id: {tid}}) return player, on, comment, by, fan'
+        result = self._graph.run(q, tid=team_id)
+        return result
+        
+
+    # def get_player_comments2(self, player_id):
+    #     q = '(f)-[r2:COMMENT_BY]->(c)-[r:COMMENT_ON]->(pl:Player {player_id:"{}"}) return p'.format(player_id)
+    #     result = self._graph.run(q)
+
+
 
 
 

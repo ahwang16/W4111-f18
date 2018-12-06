@@ -24,6 +24,7 @@ def add_to_cache(key, value):
     ut.debug_message("Adding key = ", k)
     ut.debug_message("Adding data", value)
     r.hmset(k, value)
+    return k
 
 
 def get_from_cache(key):
@@ -32,7 +33,9 @@ def get_from_cache(key):
     :param key: A valid Redis key.
     :return: The "map object" associated with the key.
     """
-    result = r.hgetall(key)
+    result = r.get(key)
+    if result is not None:
+        result = json.load(result)
     return result
 
 
@@ -103,7 +106,11 @@ def check_query_cache(resource, template, fields):
     :param fields: A list of fields to return, e.g. ['nameLast', 'nameFirst', 'throws', 'birthCity']
     :return: Returns a cached value from the Redis result cache if one exists.
     """
-    pass
+    key = compute_key(resource, template, fields)
+    result = get_from_cache(key)
+    if result is not None and len(result) > 0:
+        result = json.loads(result)
+    return result
 
 
 def add_to_query_cache(resource, template, fields, query_result):
@@ -116,5 +123,7 @@ def add_to_query_cache(resource, template, fields, query_result):
     :param query_result: The value returned from the data service as a result of the query.
     :return: key value for cached resource.
     """
-    pass
+    key = compute_key(resource, template, fields)
+    result = add_to_cache(key, json.dumps(query_result))
+    return result
 

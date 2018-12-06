@@ -3,6 +3,7 @@ import pymysql.cursors
 import json
 import utils.utils as ut
 from utils import dffutils as db
+import data_cache
 
 
 db_schema = None                                # Schema containing accessed data
@@ -54,6 +55,16 @@ def templateToWhereClause(t):
 # Given a table, template and list of fields. Return the result.
 def retrieve_by_template(table, t, fields=None, limit=None, offset=None, orderBy=None):
 
+    result = data_cache.check_query_cache(table, t, fields)
+
+    if result is not None:
+        print("CACHE HIT")
+        return result
+    else:
+        print("CACHE MISS")
+
+    original_fields = fields
+
     if t is not None:
         w = templateToWhereClause(t)
     else:
@@ -78,6 +89,9 @@ def retrieve_by_template(table, t, fields=None, limit=None, offset=None, orderBy
     q = "SELECT " + fields + " FROM " + table + " " + w + ";"
 
     r = db.run_q(cnx, q, None, fetch=True, commit=True)
+
+
+    result = data_cache.add_to_query_cache(table, t, original_fields, r)
     return r
 
 
