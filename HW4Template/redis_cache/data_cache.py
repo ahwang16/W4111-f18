@@ -1,6 +1,9 @@
 import redis
-from utils import utils as ut
+import sys
+sys.path.append('..')
+import utils.utils as ut
 from operator import itemgetter
+import json
 
 """
 Connect to local Redis server. StrictRedis complies more closely with standard than
@@ -23,7 +26,8 @@ def add_to_cache(key, value):
     k = key
     ut.debug_message("Adding key = ", k)
     ut.debug_message("Adding data", value)
-    r.hmset(k, value)
+    data = json.dumps(value)
+    r.set(k, data)
     return k
 
 
@@ -35,7 +39,7 @@ def get_from_cache(key):
     """
     result = r.get(key)
     if result is not None:
-        result = json.load(result)
+        result = json.loads(result)
     return result
 
 

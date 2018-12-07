@@ -1,10 +1,7 @@
-#from social_graph import fan_comment
-#from utils import utils as ut
-
-import HW4Template.social_graph.fan_comment_template as fct
-import HW4Template.utils.utils as ut
-
-
+import sys
+sys.path.append('..')
+import social_graph.fan_comment_template as fct
+import utils.utils as ut
 import json
 import py2neo
 import pymysql
@@ -16,7 +13,7 @@ cnx = pymysql.connect(host='localhost',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 
-fg = fct.FanGraph(auth=('neo4j','sh01dan5'),
+fg = fct.FanGraph(auth=('neo4j','password'),
                               host="localhost",
                               port=7687,
                               secure=False)
@@ -26,7 +23,7 @@ ut.set_debug_mode(True)
 
 def load_players():
 
-    q = "SELECT playerID, nameLast, nameFirst FROM People where  " + \
+    q = "SELECT playerID, nameLast, nameFirst FROM People where " + \
         "exists (select * from appearances where appearances.playerID = people.playerID and yearID >= 2017)"
 
     curs = cnx.cursor()
@@ -114,14 +111,6 @@ def create_supports():
     fg.create_supports("al1", "CHN")
 
 
-
-#load_players()
-#load_teams()
-#load_appearances()
-#load_follows_fans()
-#create_supports()
-
-
 def test_create_comment():
     t = fg.get_team('BOS')
     f = fg.get_fan('al1')
@@ -130,20 +119,29 @@ def test_create_comment():
     pid = p['player_id']
     tid = t['team_id']
     fid = f['uni']
+    # print(pid, tid, fid)
     c = fg.create_comment(fid, c, tid, pid)
-
-#test_create_comment()
+    # print(c)
 
 
 def test_create_sub_comment():
-    c = fg.get_comment("f50a9718-8df5-4bac-af24-f6c99749e8a5")
+    # f50a9718-8df5-4bac-af24-f6c99749e8a5
+    c = fg.get_comment("3e8b7c14-0cc6-458f-8625-3d439f0388fe")
     m = "Totally agree!"
-    r = fg.create_sub_comment('al1', "f50a9718-8df5-4bac-af24-f6c99749e8a5", m)
-
-test_create_sub_comment()
-
+    # f50a9718-8df5-4bac-af24-f6c99749e8a5
+    r = fg.create_sub_comment('al1', "3e8b7c14-0cc6-458f-8625-3d439f0388fe", m)
 
 
+
+if __name__ == "__main__":
+    load_players()
+    load_teams()
+    load_appearances()
+    load_follows_fans()
+    create_supports()
+    test_create_comment()
+    test_create_sub_comment()
+  
 
 
 

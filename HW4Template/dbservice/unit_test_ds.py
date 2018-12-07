@@ -1,4 +1,6 @@
-from dbservice import dataservice
+import dataservice
+import sys
+sys.path.append("..")
 import utils.utils as ut
 import json
 
@@ -17,7 +19,9 @@ def test_get_resource():
     result = dataservice.retrieve_by_template("people", template, fields)
     print("Result = ", json.dumps(result, indent=2))
 
-test_get_resource()
+
+if __name__ == "__main__":
+	test_get_resource()
 
 
 

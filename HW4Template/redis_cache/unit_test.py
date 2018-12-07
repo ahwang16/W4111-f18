@@ -1,5 +1,7 @@
-from redis_cache import data_cache
-from utils import utils as ut
+import data_cache
+import sys
+sys.path.append("..")
+import utils.utils as ut
 
 ut.set_debug_mode(True)
 
@@ -17,5 +19,7 @@ def test2():
     print("Result = ", result)
 
 
-test2()
+if __name__ == "__main__":
+	test1()
+	test2()
 

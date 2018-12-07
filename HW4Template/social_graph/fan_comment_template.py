@@ -1,6 +1,6 @@
 from py2neo import Graph, NodeMatcher, Node, Relationship, RelationshipMatcher
 import json
-from HW4Template.utils import utils as ut
+from utils import utils as ut
 import uuid
 
 
@@ -176,7 +176,7 @@ class FanGraph(object):
                 if t is None:
                     raise ValueError("Player not found")
 
-            comment_id = uuid.uuid4()
+            comment_id = str(uuid.uuid4())
 
             new_c = Node("Comment", comment_id=comment_id, comment=comment)
             tx.create(new_c)
@@ -197,7 +197,7 @@ class FanGraph(object):
             return new_c
 
         except Exception as e:
-            print("Exception is e ", e)
+            print("Exception is", e)
             tx.rollback()
             raise(e)
 
@@ -236,7 +236,7 @@ class FanGraph(object):
             return new_c
 
         except Exception as e:
-            print("Exception = e", e)
+            print("Exception is", e)
             tx.rollback()
             raise e
 

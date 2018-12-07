@@ -1,9 +1,11 @@
 
 import pymysql.cursors
 import json
+import sys
+sys.path.append('..')
 import utils.utils as ut
 from utils import dffutils as db
-import data_cache
+from redis_cache import data_cache
 
 
 db_schema = None                                # Schema containing accessed data
